@@ -1,4 +1,5 @@
 import os
+import argparse
 import requests
 from dotenv import load_dotenv
 
@@ -45,18 +46,18 @@ def is_bitlink(url):
     }
     url = 'https://api-ssl.bitly.com/v4/bitlinks/{}'.format(url)
     response = requests.get(url, headers=headers)
+    if not response.ok:
+        return
     return response.ok
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("url")
+    args = parser.parse_args()
+    input_url = args.url
     load_dotenv()
     token = os.getenv("TOKEN")
-    while True:
-        input_url = input('Enter url:')
-        if '//' in input_url:
-            break
-        else:
-            print('Error: Enter correct URL (with http/s)')
     url_domain = input_url.split('//')[1]
     if is_bitlink(url_domain):
         total_clicks = get_url_clicks(url_domain)
@@ -64,11 +65,3 @@ if __name__ == "__main__":
     else:
         shorten_url = get_shorten_url(token, input_url)
         print(shorten_url)
-
-
-    # def test():
-    #     r = requests.get('https://www.detmir.r')
-    #     return r.ok
-
-    # res = test()
-    # print(res)
